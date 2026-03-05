@@ -129,7 +129,7 @@ h3,
 h4,
 h5,
 h6 {
-	@apply font-bold text-balance break-words;
+	@apply font-bold text-balance wrap-break-word;
 }
 
 h1,
