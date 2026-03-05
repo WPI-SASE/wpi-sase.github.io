@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import { siteLang, siteCurrency } from "~/data/config";
 const plates = await getCollection("plates");
 const siteLangFormat = siteLang.replace("_", "-");
@@ -39,7 +40,7 @@ const siteLangFormat = siteLang.replace("_", "-");
 
 				<dl class="max-w-5xl mx-auto">
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-x-16 xl:gap-x-32">
-						{plate.data.plates.map((item) => (
+						{plate.data.plates.map((item: CollectionEntry<"plates">["data"]["plates"][number]) => (
 							<div>
 								<dt>
 									<div class="flex justify-between items-center">
@@ -159,7 +160,7 @@ const siteLangFormat = siteLang.replace("_", "-");
 					}
 				});
 			},
-			{ rootMargin: "-20% 0px -60% 0px", threshold: 0 }
+			{ rootMargin: "-20% 0px -60% 0px", threshold: 0 },
 		);
 
 		// Observe all category sections
