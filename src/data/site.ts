@@ -25,12 +25,15 @@ export const site = {
 export const sharedWheelImages = [
   {
     src: '../assets/images/wheel/IMG_4030.png',
+    alt: 'Darren Kwee, a SASE WPI alum giving a presentation to our chapter at a professional development event'
   },
   {
-    src: '../assets/images/wheel/IMG_4036.png'
+    src: '../assets/images/wheel/IMG_4036.png',
+    alt: 'Students at a professional development event'
   },
   {
-    src: '../assets/images/wheel/IMG_4038.jpg'
+    src: '../assets/images/wheel/IMG_4038.jpg',
+    alt: 'Students at a professional development event'
   }
 ];
 
