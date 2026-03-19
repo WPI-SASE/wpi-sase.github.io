@@ -25,7 +25,12 @@ export const site = {
 export const sharedWheelImages = [
   {
     src: '../assets/images/wheel/IMG_4030.png',
-    alt: 'Darren Kwee, an alum, presenting to our chapter at a recent professional development event'
+  },
+  {
+    src: '../assets/images/wheel/IMG_4036.png'
+  },
+  {
+    src: '../assets/images/wheel/IMG_4038.jpg'
   }
 ];
 
