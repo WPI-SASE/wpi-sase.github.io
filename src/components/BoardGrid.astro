@@ -1,0 +1,33 @@
+---
+interface Member {
+  name: string;
+  role: string;
+  major?: string;
+  image?: string;
+  bio: string;
+}
+
+interface Props {
+  members: Member[];
+}
+
+const { members } = Astro.props;
+---
+
+<section class="container flow-section">
+  <div class="board-grid">
+    {members.map((member) => (
+      <article class="board-card">
+        <div class="board-image-wrap">
+          <img src={member.image} alt={`${member.name} placeholder portrait`} class="board-image" loading="lazy" />
+        </div>
+        <div class="board-copy">
+          <p class="eyebrow small">{member.role}</p>
+          <h2>{member.name}</h2>
+          {member.major && <p class="supporting-text">{member.major}</p>}
+          <p>{member.bio}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import ContentSection from '../components/ContentSection.astro';
+import BoardGrid from '../components/BoardGrid.astro';
+import { executiveBoardTemplate, pageContent } from '../data/site';
+
+const content = pageContent.executiveBoard;
+---
+
+<Layout title="Executive Board">
+  <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro} />
+  {content.sections.map((section) => <ContentSection title={section.title} body={section.body} />)}
+  <BoardGrid members={executiveBoardTemplate} />
+</Layout>

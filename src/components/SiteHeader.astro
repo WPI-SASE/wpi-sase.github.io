@@ -1,0 +1,64 @@
+---
+import { site } from '../data/site';
+import { Image } from 'astro:assets';
+import logo from '../assets/images/logo.png'
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="/" class="site-brand">
+            <!-- 🖼️ Logo Image -->
+            <Image src={logo} alt="SASE Logo" class="brand-logo" />
+
+            <!-- Text -->
+            <span class="brand-text">
+        <strong>{site.shortName}</strong>
+        <span class="brand-subtitle">{site.tagline}</span>
+      </span>
+        </a>
+
+        <nav aria-label="Primary navigation" class="site-nav">
+          {site.nav.map((item) => (
+                  <a href={item.href} class={currentPath === item.href ? 'active' : ''}>
+                    {item.label}
+                  </a>
+          ))}
+        </nav>
+    </div>
+</header>
+
+<style>
+    .site-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .brand-logo {
+        height: 42px; /* adjust as needed */
+        width: auto;
+        object-fit: contain;
+        border-radius: 15px;
+    }
+
+    /* Text next to logo */
+    .brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+    }
+
+    .brand-subtitle {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+
+    /* Optional: hide subtitle on small screens */
+    @media (max-width: 640px) {
+        .brand-subtitle {
+            display: none;
+        }
+    }
+</style>

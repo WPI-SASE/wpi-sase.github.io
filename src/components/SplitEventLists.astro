@@ -1,0 +1,37 @@
+---
+interface EventItem {
+  title: string;
+  details: string;
+}
+
+interface Props {
+  upcoming: EventItem[];
+  past: EventItem[];
+}
+
+const { upcoming, past } = Astro.props;
+---
+
+<section class="container flow-section">
+  <div class="event-columns">
+    <div class="event-panel">
+      <p class="eyebrow small">Upcoming</p>
+      {upcoming.map((event) => (
+        <article class="event-item">
+          <h2>{event.title}</h2>
+          <p>{event.details}</p>
+        </article>
+      ))}
+    </div>
+
+    <div class="event-panel">
+      <p class="eyebrow small">Past</p>
+      {past.map((event) => (
+        <article class="event-item">
+          <h2>{event.title}</h2>
+          <p>{event.details}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

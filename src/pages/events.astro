@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import ContentSection from '../components/ContentSection.astro';
+import SplitEventLists from '../components/SplitEventLists.astro';
+import { eventTemplate, pageContent } from '../data/site';
+
+const content = pageContent.events;
+---
+
+<Layout title="Events">
+  <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro} />
+  {content.sections.map((section) => <ContentSection title={section.title} body={section.body} />)}
+  <SplitEventLists upcoming={eventTemplate.upcoming} past={eventTemplate.past} />
+</Layout>

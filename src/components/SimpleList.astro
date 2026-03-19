@@ -1,0 +1,25 @@
+---
+interface Item {
+  title: string;
+  summary: string;
+  cta?: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="container flow-section">
+  <div class="simple-list">
+    {items.map((item) => (
+      <article class="simple-item">
+        <h2>{item.title}</h2>
+        <p>{item.summary}</p>
+        {item.cta && <p class="supporting-text">{item.cta}</p>}
+      </article>
+    ))}
+  </div>
+</section>

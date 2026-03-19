@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import ContentSection from '../components/ContentSection.astro';
+import SimpleList from '../components/SimpleList.astro';
+import { pageContent, pillarTemplate } from '../data/site';
+
+const content = pageContent.pillars;
+---
+
+<Layout title="3 Pillars">
+  <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro} />
+  {content.sections.map((section) => <ContentSection title={section.title} body={section.body} />)}
+  <SimpleList items={pillarTemplate} />
+</Layout>

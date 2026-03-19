@@ -1,0 +1,82 @@
+---
+import { Image } from 'astro:assets';
+
+interface ImageItem {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  images: ImageItem[];
+  id?: string;
+}
+
+const { images, id = 'shared-wheel' } = Astro.props;
+---
+
+<section class="image-wheel-section container flow-section" aria-label="Featured chapter images">
+  <div class="wheel-layout" data-image-wheel={id}>
+    <div class="wheel-visual">
+      {images.map((image, index) => (
+        <figure class={`wheel-slide ${index === 0 ? 'is-active' : ''}`} data-slide>
+          <img src={image.src} alt={image.alt} loading={index === 0 ? 'eager' : 'lazy'} />
+          {image.caption && <figcaption>{image.caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+
+    <div class="wheel-controls" aria-label="Select featured image">
+      {images.map((image, index) => (
+        <button
+          type="button"
+          class={`wheel-dot ${index === 0 ? 'is-active' : ''}`}
+          aria-label={`Show image ${index + 1}`}
+          data-dot
+        >
+          <span>{index + 1}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-image-wheel]').forEach((wheel) => {
+    const slides = Array.from(wheel.querySelectorAll('[data-slide]'));
+    const dots = Array.from(wheel.querySelectorAll('[data-dot]'));
+    if (!slides.length || !dots.length) return;
+
+    let activeIndex = 0;
+    let intervalId;
+
+    const showSlide = (index) => {
+      activeIndex = index;
+      slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+    };
+
+    const startAutoScroll = () => {
+      clearInterval(intervalId);
+      intervalId = window.setInterval(() => {
+        const nextIndex = (activeIndex + 1) % slides.length;
+        showSlide(nextIndex);
+      }, 4500);
+    };
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        showSlide(index);
+        startAutoScroll();
+      });
+    });
+
+    wheel.addEventListener('mouseenter', () => clearInterval(intervalId));
+    wheel.addEventListener('mouseleave', startAutoScroll);
+    wheel.addEventListener('focusin', () => clearInterval(intervalId));
+    wheel.addEventListener('focusout', startAutoScroll);
+
+    showSlide(0);
+    startAutoScroll();
+  });
+</script>
