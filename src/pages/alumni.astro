@@ -8,13 +8,14 @@ const content = pageContent.alumni;
 ---
 
 <Layout title="Alumni">
-  <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro} />
-  {content.sections.map((section) => <ContentSection title={section.title} body={section.body} />)}
+    <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro}/>
+  {content.sections.map((section) =>
+          <ContentSection title={section.title} body={section.body}/>)}
 
-  <section class="container flow-section">
-    <div class="content-panel">
-      <h2>Reconnect placeholder</h2>
-      <p>Add an alumni contact form, newsletter sign-up, mentorship interest form, or a networking call to action here.</p>
-    </div>
-  </section>
+    <section class="container flow-section">
+        <div class="content-panel">
+            <!--<h2>Reconnect placeholder</h2>-->
+            <!--<p>Add an alumni contact form, newsletter sign-up, mentorship interest form, or a networking call to action here.</p>-->
+        </div>
+    </section>
 </Layout>

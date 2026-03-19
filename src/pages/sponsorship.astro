@@ -8,13 +8,14 @@ const content = pageContent.sponsorship;
 ---
 
 <Layout title="Sponsorship">
-  <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro} />
-  {content.sections.map((section) => <ContentSection title={section.title} body={section.body} />)}
+    <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro}/>
+  {content.sections.map((section) =>
+          <ContentSection title={section.title} body={section.body}/>)}
 
-  <section class="container flow-section">
-    <div class="content-panel">
-      <h2>Sponsorship package placeholder</h2>
-      <p>Add your sponsorship package summary, benefits, contact details, and a link or file download here.</p>
-    </div>
-  </section>
+    <section class="container flow-section">
+        <div class="content-panel">
+            <!--<h2>Sponsorship package placeholder</h2>-->
+            <!--<p>Add your sponsorship package summary, benefits, contact details, and a link or file download here.</p>-->
+        </div>
+    </section>
 </Layout>

@@ -1,82 +1,286 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 
 interface ImageItem {
-  src: string;
-  alt: string;
-  caption?: string;
+    src: string;
+    alt: string;
+    caption?: string;
 }
 
 interface Props {
-  images: ImageItem[];
-  id?: string;
+    images: ImageItem[];
+    id?: string;
+    intervalMs?: number;
 }
 
-const { images, id = 'shared-wheel' } = Astro.props;
+const {
+    images = [],
+    id = 'image-wheel',
+    intervalMs = 4500
+} = Astro.props;
+
+// Load all valid image files from src/assets
+const assetModules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/**/*.{jpg,jpeg,png,webp,avif,gif}',
+  { eager: true }
+);
+
+function normalizeToAssetKey(src: string) {
+  return src;
+}
+
+const resolvedImages = images.map((image) => {
+    const mod = assetModules[image.src];
+
+    return {
+        ...image,
+        asset: mod?.default ?? null
+    };
+});
+
+const validImages = resolvedImages.filter((image) => image.asset);
 ---
 
-<section class="image-wheel-section container flow-section" aria-label="Featured chapter images">
-  <div class="wheel-layout" data-image-wheel={id}>
-    <div class="wheel-visual">
-      {images.map((image, index) => (
-        <figure class={`wheel-slide ${index === 0 ? 'is-active' : ''}`} data-slide>
-          <img src={image.src} alt={image.alt} loading={index === 0 ? 'eager' : 'lazy'} />
-          {image.caption && <figcaption>{image.caption}</figcaption>}
-        </figure>
-      ))}
-    </div>
+<section class="image-wheel" aria-label="Featured images">
+    {validImages.length > 0 ? (
+      <div class="image-wheel__inner" data-wheel={id} data-interval={intervalMs}>
+          <div class="image-wheel__slides">
+              {validImages.map((image, index) => (
+                <figure
+                  class={`image-wheel__slide ${index === 0 ? 'is-active' : ''}`}
+                  data-slide
+                  aria-hidden={index === 0 ? 'false' : 'true'}
+                >
+                    <Image
+                      src={image.asset!}
+                      alt={image.alt}
+                      class="image-wheel__img"
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      widths={[800, 1200, 1600]}
+                      sizes="(max-width: 900px) 100vw, 1100px"
+                    />
+                    {image.caption && (
+                      <figcaption class="image-wheel__caption">{image.caption}</figcaption>
+                    )}
+                </figure>
+              ))}
+          </div>
 
-    <div class="wheel-controls" aria-label="Select featured image">
-      {images.map((image, index) => (
-        <button
-          type="button"
-          class={`wheel-dot ${index === 0 ? 'is-active' : ''}`}
-          aria-label={`Show image ${index + 1}`}
-          data-dot
-        >
-          <span>{index + 1}</span>
-        </button>
-      ))}
-    </div>
-  </div>
+          {validImages.length > 1 && (
+            <>
+                <button class="image-wheel__arrow image-wheel__arrow--prev" type="button" data-prev aria-label="Previous image">
+                    ‹
+                </button>
+
+                <button class="image-wheel__arrow image-wheel__arrow--next" type="button" data-next aria-label="Next image">
+                    ›
+                </button>
+
+                <div class="image-wheel__dots" aria-label="Select image">
+                    {validImages.map((_, index) => (
+                      <button
+                        type="button"
+                        class={`image-wheel__dot ${index === 0 ? 'is-active' : ''}`}
+                        data-dot
+                        data-index={index}
+                        aria-label={`Go to image ${index + 1}`}
+                        aria-current={index === 0 ? 'true' : 'false'}
+                      />
+                    ))}
+                </div>
+            </>
+          )}
+      </div>
+    ) : (
+      <div class="image-wheel__empty">
+          <p>No valid images found.</p>
+          <p>Add files under <code>src/assets/</code> and pass paths like <code>wheel/1.jpg</code>.</p>
+      </div>
+    )}
 </section>
 
 <script>
-  document.querySelectorAll('[data-image-wheel]').forEach((wheel) => {
-    const slides = Array.from(wheel.querySelectorAll('[data-slide]'));
-    const dots = Array.from(wheel.querySelectorAll('[data-dot]'));
-    if (!slides.length || !dots.length) return;
+    document.querySelectorAll('[data-wheel]').forEach((wheel) => {
+        const slides = Array.from(wheel.querySelectorAll('[data-slide]'));
+        const dots = Array.from(wheel.querySelectorAll('[data-dot]'));
+        const prev = wheel.querySelector('[data-prev]');
+        const next = wheel.querySelector('[data-next]');
+        const intervalMs = Number(wheel.getAttribute('data-interval')) || 4500;
 
-    let activeIndex = 0;
-    let intervalId;
+        if (!slides.length) return;
 
-    const showSlide = (index) => {
-      activeIndex = index;
-      slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
-      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-    };
+        let activeIndex = 0;
+        let timer;
 
-    const startAutoScroll = () => {
-      clearInterval(intervalId);
-      intervalId = window.setInterval(() => {
-        const nextIndex = (activeIndex + 1) % slides.length;
-        showSlide(nextIndex);
-      }, 4500);
-    };
+        const render = (index) => {
+            activeIndex = index;
 
-    dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        showSlide(index);
-        startAutoScroll();
-      });
+            slides.forEach((slide, i) => {
+                const active = i === index;
+                slide.classList.toggle('is-active', active);
+                slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+            });
+
+            dots.forEach((dot, i) => {
+                const active = i === index;
+                dot.classList.toggle('is-active', active);
+                dot.setAttribute('aria-current', active ? 'true' : 'false');
+            });
+        };
+
+        const nextSlide = () => {
+            render((activeIndex + 1) % slides.length);
+        };
+
+        const prevSlide = () => {
+            render((activeIndex - 1 + slides.length) % slides.length);
+        };
+
+        const start = () => {
+            if (slides.length < 2) return;
+            stop();
+            timer = window.setInterval(nextSlide, intervalMs);
+        };
+
+        const stop = () => {
+            if (timer) window.clearInterval(timer);
+        };
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                render(index);
+                start();
+            });
+        });
+
+        prev?.addEventListener('click', () => {
+            prevSlide();
+            start();
+        });
+
+        next?.addEventListener('click', () => {
+            nextSlide();
+            start();
+        });
+
+        wheel.addEventListener('mouseenter', stop);
+        wheel.addEventListener('mouseleave', start);
+        wheel.addEventListener('focusin', stop);
+        wheel.addEventListener('focusout', start);
+
+        render(0);
+        start();
     });
-
-    wheel.addEventListener('mouseenter', () => clearInterval(intervalId));
-    wheel.addEventListener('mouseleave', startAutoScroll);
-    wheel.addEventListener('focusin', () => clearInterval(intervalId));
-    wheel.addEventListener('focusout', startAutoScroll);
-
-    showSlide(0);
-    startAutoScroll();
-  });
 </script>
+
+<style>
+.image-wheel {
+  width: 100%;
+  }
+
+.image-wheel__inner {
+  position: relative;
+  }
+
+.image-wheel__slides {
+  position: relative;
+  }
+
+.image-wheel__slide {
+  display: none;
+  margin: 0;
+  }
+
+.image-wheel__slide.is-active {
+  display: block;
+  }
+
+.image-wheel__img {
+  display: block;
+  width: 100%;
+  height: min(65vw, 42rem);
+  object-fit: cover;
+  border-radius: 1rem;
+  }
+
+.image-wheel__caption {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(15, 23, 42, 0.78);
+  }
+
+.image-wheel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 2;
+  }
+
+.image-wheel__arrow--prev {
+  left: 1rem;
+  }
+
+.image-wheel__arrow--next {
+  right: 1rem;
+  }
+
+.image-wheel__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  }
+
+.image-wheel__dot {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.8);
+  cursor: pointer;
+  }
+
+.image-wheel__dot.is-active {
+  background: rgba(37, 99, 235, 1);
+  }
+
+.image-wheel__empty {
+  padding: 2rem;
+  border: 1px dashed rgba(148, 163, 184, 0.8);
+  border-radius: 1rem;
+  }
+
+code {
+  font-family: monospace;
+  }
+
+@media (max-width: 640px) {
+  .image-wheel__img {
+  height: 18rem;
+  }
+
+  .image-wheel__arrow {
+  width: 2.35rem;
+  height: 2.35rem;
+  }
+
+  .image-wheel__arrow--prev {
+  left: 0.5rem;
+  }
+
+  .image-wheel__arrow--next {
+  right: 0.5rem;
+  }
+  }
+</style>

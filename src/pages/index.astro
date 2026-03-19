@@ -8,17 +8,17 @@ const content = pageContent.home;
 ---
 
 <Layout title="Home">
-  <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro} />
-  {content.sections.map((section) => <ContentSection title={section.title} body={section.body} />)}
+    <PageIntro eyebrow={content.eyebrow} title={content.title} intro={content.intro}/>
+  {content.sections.map((section) =>
+          <ContentSection title={section.title} body={section.body}/>)}
 
-  <section class="container flow-section quick-links-section">
-    <div class="simple-list">
-      {site.nav.filter((item) => item.href !== '/').map((item) => (
-        <a href={item.href} class="simple-item simple-link-card">
-          <h2>{item.label}</h2>
-          <p>Use this page template to add your chapter-specific content.</p>
-        </a>
-      ))}
-    </div>
-  </section>
+    <section class="container flow-section quick-links-section">
+        <div class="simple-list">
+          {site.nav.filter((item) => item.href !== '/').map((item) => (
+                  <a href={item.href} class="simple-item simple-link-card">
+                      <h2>{item.label}</h2>
+                  </a>
+          ))}
+        </div>
+    </section>
 </Layout>
